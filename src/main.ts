@@ -11,6 +11,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Rent API')
     .setDescription('Documentação da Rent API')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
