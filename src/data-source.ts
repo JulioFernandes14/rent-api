@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { RentEntity } from './rent/entities/rent.entity';
 import { RentItemEntity } from './rent/entities/rent-item.entity';
+import { UserEntity } from './users/entities/user.entity';
 
 export default new DataSource({
   type: 'postgres',
@@ -9,6 +10,6 @@ export default new DataSource({
   username: 'postgres',
   password: 'root1',
   database: 'rentdb',
-  entities: [RentEntity, RentItemEntity],
+  entities: [RentEntity, RentItemEntity, UserEntity],
   migrations: ['src/migrations/*.ts'],
 });

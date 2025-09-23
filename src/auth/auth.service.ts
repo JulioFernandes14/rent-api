@@ -1,20 +1,47 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginResponseDto } from './dto/login.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    @InjectRepository(UserEntity)
+    private readonly userEntityRepository: Repository<UserEntity>,
+  ) {}
 
-  login(username: string, password: string): LoginResponseDto {
-    if (username !== 'MASTER' || !this.validatePassword(password)) {
-      throw new UnauthorizedException('Usuário ou senha inválidos.');
+  async login(username: string, password: string): Promise<LoginResponseDto> {
+    if (username === 'MASTER' && this.validatePassword(password)) {
+      const payload = { username: 'MASTER', email: '', id: '' };
+  
+      return {
+        access_token: this.jwtService.sign(payload),
+        ...payload
+      };
     }
-    const payload = { username: 'MASTER' };
 
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    const user = await this.userEntityRepository.findOne({
+      where: {
+        username
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException("Usuário ou senha inválidos");
+    }
+
+    if (user.password === password) {
+      const payload = { username: user.username, email: user.email, id: user.id };
+      return {
+        access_token: this.jwtService.sign(payload),
+        ...payload
+      }
+    }
+
+    throw new UnauthorizedException('Usuário ou senha inválidos.');
   }
 
   validatePassword(password: string): boolean {

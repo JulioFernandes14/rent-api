@@ -12,7 +12,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Realizar login do usuário' })
   @ApiResponse({ status: 201, description: 'Login realizado com sucesso', type: LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Usuário ou senha inválidos' })
-  login(@Body() dto: LoginRequestDto): LoginResponseDto {
+  login(@Body() dto: LoginRequestDto): Promise<LoginResponseDto> {
     return this.authService.login(dto.username, dto.password);
   }
 }
