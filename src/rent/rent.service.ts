@@ -85,4 +85,15 @@ export class RentService {
         const rent = await this.findOne(id);
         await this.rentRepo.remove(rent);
     }
+
+    async countRents(): Promise<{total: number}> {
+        const total = await this.rentRepo.count();
+        return { total }
+    }
+
+    async countTotalValue(): Promise<{totalValue: number}> {
+        const rentItems = await this.rentItemRepo.find();
+        const total = rentItems.reduce((total, item) => total += item.quantity * item.value, 0);
+        return { totalValue: total / 1000 };
+    }
 }

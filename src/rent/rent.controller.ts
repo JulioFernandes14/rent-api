@@ -41,4 +41,18 @@ export class RentController {
   async remove(@Param('id') id: string): Promise<void> {
     return this.rentService.remove(id);
   }
+  
+  @Get('total')
+  @ApiOperation({ summary: 'Retornar a quantidade total de aluguéis armazenados na base' })
+  @ApiResponse({ status: 200, description: 'Quantidade de aluguéis retornado com sucesso'})
+  async countRents(): Promise<{ total: number }> {
+    return await this.rentService.countRents();
+  }
+  
+  @Get('total-value')
+  @ApiOperation({ summary: 'Retornar a quantidade total de aluguéis armazenados na base' })
+  @ApiResponse({ status: 200, description: 'Quantidade de aluguéis retornado com sucesso'})
+  async countTotalValue(): Promise<{ totalValue: number }> {
+    return await this.rentService.countTotalValue();
+  }
 }

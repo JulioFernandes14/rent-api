@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginResponseDto } from './dto/login.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,7 +30,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException("Usuário ou senha inválidos");
+      throw new UnauthorizedException("Usuário ou senha inválidos");
     }
 
     if (user.password === password) {
