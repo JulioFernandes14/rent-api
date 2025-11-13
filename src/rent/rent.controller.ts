@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Delete, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Delete, Param, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { RentEntity } from './entities/rent.entity';
 import { RentService } from './rent.service';
@@ -17,14 +17,19 @@ export class RentController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todas as locações' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Data inicial (yyyy-mm-dd)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'Data final (yyyy-mm-dd)' })
   @ApiResponse({ status: 200, description: 'Lista de locações retornada com sucesso', type: [ListRentResponseDto] })
-  async findAll(): Promise<
+  async findAll(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ): Promise<
     (RentEntity & {
       totalValue: number;
       items: (RentItemEntity & { valueAdjusted: number })[];
     })[]
   > {
-    return this.rentService.findAll();
+    return this.rentService.findAll(startDate, endDate);
   }
 
   @Post()

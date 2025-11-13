@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 import { CreateRentDto } from './dto/create-rent.dto';
 import { RentItemEntity } from './entities/rent-item.entity';
 import { RentEntity } from './entities/rent.entity';
@@ -37,13 +37,41 @@ export class RentService {
         return await this.rentRepo.save(rent);
     }
 
-    async findAll(): Promise<
+    async findAll(startDate?: string, endDate?: string): Promise<
         (RentEntity & {
             totalValue: number;
             items: (RentItemEntity & { valueAdjusted: number })[];
         })[]
     > {
+        const where: Record<string, any> = {};
+
+        const isValidDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+        if (startDate) {
+            if (!isValidDate(startDate)) {
+                throw new BadRequestException('startDate deve estar no formato yyyy-mm-dd');
+            }
+        }
+
+        if (endDate) {
+            if (!isValidDate(endDate)) {
+                throw new BadRequestException('endDate deve estar no formato yyyy-mm-dd');
+            }
+        }
+
+        const start = startDate ? new Date(`${startDate}T00:00:00`) : undefined;
+        const end = endDate ? new Date(`${endDate}T23:59:59.999`) : undefined;
+
+        if (start && end) {
+            where.createdAt = Between(start, end);
+        } else if (start) {
+            where.createdAt = MoreThanOrEqual(start);
+        } else if (end) {
+            where.createdAt = LessThanOrEqual(end);
+        }
+
         const rents = await this.rentRepo.find({
+            where,
             relations: ['items'],
             order: { createdAt: 'DESC' },
         });
