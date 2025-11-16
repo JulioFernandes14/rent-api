@@ -49,15 +49,25 @@ export class RentController {
   
   @Get('total')
   @ApiOperation({ summary: 'Retornar a quantidade total de aluguéis armazenados na base' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Data inicial (yyyy-mm-dd)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'Data final (yyyy-mm-dd)' })
   @ApiResponse({ status: 200, description: 'Quantidade de aluguéis retornado com sucesso'})
-  async countRents(): Promise<{ total: number }> {
-    return await this.rentService.countRents();
+  async countRents(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ): Promise<{ total: number }> {
+    return await this.rentService.countRents(startDate, endDate);
   }
   
   @Get('total-value')
   @ApiOperation({ summary: 'Retornar a quantidade total de aluguéis armazenados na base' })
+  @ApiQuery({ name: 'startDate', required: false, description: 'Data inicial (yyyy-mm-dd)' })
+  @ApiQuery({ name: 'endDate', required: false, description: 'Data final (yyyy-mm-dd)' })
   @ApiResponse({ status: 200, description: 'Quantidade de aluguéis retornado com sucesso'})
-  async countTotalValue(): Promise<{ totalValue: number }> {
-    return await this.rentService.countTotalValue();
+  async countTotalValue(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ): Promise<{ totalValue: number }> {
+    return await this.rentService.countTotalValue(startDate, endDate);
   }
 }
